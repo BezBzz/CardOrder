@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.List;
 
@@ -23,10 +24,14 @@ public class CardOrderTest {
     }
 
     @BeforeEach
-    public void setup() {
-
-        driver = new ChromeDriver();
+    public void setUp() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--headless");
+        driver = new ChromeDriver(options);
     }
+
 
     @AfterEach
     public void teardown() {
@@ -39,11 +44,11 @@ public class CardOrderTest {
     public void shouldCardOrder() {
         driver.get("http://localhost:9999");
         List<WebElement> textFields = driver.findElements(By.className("input__control"));
-        textFields.get(0).sendKeys("Мухтар");
-        textFields.get(1).sendKeys("+79252162616");
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Мухтар Рыбин-Моисеев");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79252162616");
         driver.findElement(By.className("checkbox__box")).click();
         driver.findElement(By.tagName("button")).click();
-        String actualText = driver.findElement(By.className("Success_successBlock__2L3Cw")).getText().trim();
+        String actualText = driver.findElement(By.cssSelector("[data-test-id='order-success'] ")).getText().trim();
         String expected = "Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.";
         assertEquals(expected, actualText);
 
